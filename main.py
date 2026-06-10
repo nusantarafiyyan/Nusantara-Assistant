@@ -3,18 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 import os
-from dotenv import load_dotenv
 
-# Load API key
-load_dotenv()
-api_key = os.getenv("GROQ_API_KEY")
+# Ambil API key dari environment variable
+api_key = os.environ.get("GROQ_API_KEY")
 
-# Inisialisasi Groq client
+print(f"API Key loaded: {'Yes' if api_key else 'No'}")  # Debug di log Railway
+
+if not api_key:
+    raise ValueError("GROQ_API_KEY tidak ditemukan di environment variable")
+
 client = Groq(api_key=api_key)
 
 app = FastAPI()
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,19 +33,14 @@ def root():
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
-        # Panggil Groq API dengan model llama-3.3-70b-versatile (gratis & cepat)
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "user", "content": request.message}
-            ],
+            messages=[{"role": "user", "content": request.message}],
             temperature=0.7,
             max_tokens=1024,
         )
-        
         reply = completion.choices[0].message.content
         return {"reply": reply}
-        
     except Exception as e:
         print(f"Error: {e}")
         return {"reply": f"Maaf, terjadi kesalahan. Error: {str(e)}"}
