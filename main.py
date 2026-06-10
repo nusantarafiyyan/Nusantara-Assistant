@@ -4,14 +4,7 @@ from pydantic import BaseModel
 from groq import Groq
 import os
 
-# Ambil API key dari environment variable
 api_key = os.environ.get("GROQ_API_KEY")
-
-print(f"API Key loaded: {'Yes' if api_key else 'No'}")  # Debug di log Railway
-
-if not api_key:
-    raise ValueError("GROQ_API_KEY tidak ditemukan di environment variable")
-
 client = Groq(api_key=api_key)
 
 app = FastAPI()
@@ -28,19 +21,17 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {"status": "OK", "message": "Nusantara Assistant with Groq is running!"}
+    return {"status": "OK"}
 
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": request.message}],
             temperature=0.7,
             max_tokens=1024,
         )
-        reply = completion.choices[0].message.content
-        return {"reply": reply}
+        return {"reply": completion.choices[0].message.content}
     except Exception as e:
-        print(f"Error: {e}")
-        return {"reply": f"Maaf, terjadi kesalahan. Error: {str(e)}"}
+        return {"reply": f"Error: {str(e)}"}
