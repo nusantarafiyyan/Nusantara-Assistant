@@ -135,7 +135,7 @@ function App() {
     setLoading(true)
 
     try {
-      const response = await axios.post('https://nusantara-assistant-production.up.railway.app/chat', {
+      const response = await axios.post('https://nusantara-assistant-production.up.railway.app/', {
         message: currentMessage
       })
       
