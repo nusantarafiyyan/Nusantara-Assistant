@@ -42,28 +42,27 @@ function App() {
         const parsed = JSON.parse(savedConversations)
         if (Array.isArray(parsed) && parsed.length > 0) {
           setConversations(parsed)
-          // Load percakapan terakhir
           const lastConv = parsed[parsed.length - 1]
           setCurrentConversationId(lastConv.id)
           setChatHistory(lastConv.messages)
+        } else {
+          createNewConversation()
         }
       } catch (e) {
         console.error('Gagal load conversations:', e)
+        createNewConversation()
       }
     } else {
-      // Buat percakapan baru jika belum ada
       createNewConversation()
     }
   }, [])
 
-  // SAVE semua percakapan ke localStorage setiap kali berubah
   useEffect(() => {
     if (conversations.length > 0) {
       localStorage.setItem('nusantara_conversations', JSON.stringify(conversations))
     }
   }, [conversations])
 
-  // Update messages di conversations saat chatHistory berubah
   useEffect(() => {
     if (currentConversationId && chatHistory.length > 0) {
       setConversations(prev => prev.map(conv => 
@@ -123,7 +122,6 @@ function App() {
   const sendMessage = async () => {
     if (!message.trim()) return
 
-    // Jika ini pesan pertama di percakapan, update title
     if (chatHistory.length === 0) {
       updateConversationTitle(currentConversationId, message)
     }
@@ -152,9 +150,9 @@ function App() {
       let errorText = 'Maaf, terjadi kesalahan. '
       
       if (error.code === 'ERR_NETWORK') {
-        errorText = '❌ Tidak dapat terhubung ke server.\n\nPastikan backend berjalan di:\nhttp://localhost:8000'
+        errorText = '❌ Tidak dapat terhubung ke server.'
       } else if (error.response) {
-        errorText = `❌ Server error (${error.response.status})\n\n${JSON.stringify(error.response.data)}`
+        errorText = `❌ Server error (${error.response.status})`
       } else {
         errorText = `❌ Error: ${error.message || 'Silakan coba lagi.'}`
       }
@@ -189,7 +187,6 @@ function App() {
     "Bantu saya menulis email profesional"
   ]
 
-  // Format tanggal untuk display
   const formatDate = (timestamp) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -205,7 +202,7 @@ function App() {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: darkMode ? '#1e1e2f' : '#ffffff',
+      background: darkMode ? '#1e1e2f' : '#f0f4f8',
       transition: 'background 0.3s ease',
     },
     header: {
@@ -214,7 +211,7 @@ function App() {
       left: 0,
       right: 0,
       background: darkMode ? '#1e1e2f' : '#ffffff',
-      borderBottom: `1px solid ${darkMode ? '#2d2d44' : '#e5e5e5'}`,
+      borderBottom: `1px solid ${darkMode ? '#2d2d44' : '#e2e8f0'}`,
       zIndex: 50,
       padding: '0 20px',
     },
@@ -232,13 +229,13 @@ function App() {
       fontSize: '20px',
       cursor: 'pointer',
       padding: '8px',
-      borderRadius: '50%',
+      borderRadius: '8px',
       transition: 'all 0.2s',
       color: darkMode ? '#e5e5e5' : '#1e1e2f',
     },
     title: {
       fontSize: '18px',
-      fontWeight: 500,
+      fontWeight: 600,
       color: darkMode ? '#e5e5e5' : '#1e1e2f',
     },
     themeButton: {
@@ -247,7 +244,7 @@ function App() {
       fontSize: '18px',
       cursor: 'pointer',
       padding: '8px',
-      borderRadius: '50%',
+      borderRadius: '8px',
       transition: 'all 0.2s',
     },
     sidebar: {
@@ -255,13 +252,13 @@ function App() {
       top: 0,
       left: 0,
       bottom: 0,
-      width: '300px',
+      width: '280px',
       background: darkMode ? '#1e1e2f' : '#ffffff',
       boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
       transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
       transition: 'transform 0.3s ease',
       zIndex: 40,
-      padding: '70px 16px 20px',
+      padding: '70px 20px 20px',
       overflowY: 'auto',
     },
     main: {
@@ -289,7 +286,6 @@ function App() {
       fontWeight: 500,
       color: darkMode ? '#e5e5e5' : '#1e1e2f',
       marginBottom: '32px',
-      letterSpacing: '-0.5px',
     },
     inputContainer: {
       width: '100%',
@@ -303,70 +299,53 @@ function App() {
     textarea: {
       width: '100%',
       padding: '16px 50px 16px 20px',
-      border: `1px solid ${darkMode ? '#3d3d5c' : '#e0e0e0'}`,
+      border: `2px solid ${darkMode ? '#2d2d44' : '#e2e8f0'}`,
       borderRadius: '28px',
       fontSize: '16px',
       resize: 'none',
       outline: 'none',
-      background: darkMode ? '#2d2d44' : '#f8f9fa',
+      background: darkMode ? '#2d2d44' : '#ffffff',
       color: darkMode ? '#e5e5e5' : '#1e1e2f',
       fontFamily: 'inherit',
-      transition: 'all 0.2s',
     },
     sendButton: {
       position: 'absolute',
       right: '12px',
       bottom: '12px',
-      background: 'none',
+      background: '#667eea',
       border: 'none',
-      cursor: 'pointer',
-      fontSize: '20px',
-      padding: '4px',
       borderRadius: '50%',
+      width: '36px',
+      height: '36px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: darkMode ? '#a0a0c0' : '#a0a0a0',
-      transition: 'all 0.2s',
-    },
-    plusButtonWrapper: {
-      marginTop: '24px',
-      display: 'flex',
-      justifyContent: 'center',
+      cursor: 'pointer',
+      fontSize: '16px',
+      color: 'white',
     },
     plusButton: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
+      marginTop: '24px',
       padding: '8px 20px',
       background: darkMode ? '#2d2d44' : '#f0f0f0',
       border: 'none',
       borderRadius: '30px',
       fontSize: '14px',
-      fontWeight: 500,
       cursor: 'pointer',
-      transition: 'all 0.2s',
-      color: darkMode ? '#e5e5e5' : '#1e1e2f',
+      color: darkMode ? '#e5e5e5' : '#333',
     },
     flashBadge: {
       marginTop: '16px',
-      display: 'inline-block',
       padding: '4px 12px',
       background: darkMode ? '#2d2d44' : '#f0f0f0',
       borderRadius: '20px',
       fontSize: '12px',
-      color: darkMode ? '#a0a0c0' : '#666',
+      display: 'inline-block',
     },
     exampleSection: {
       marginTop: '48px',
       width: '100%',
       maxWidth: '800px',
-    },
-    exampleTitle: {
-      fontSize: '13px',
-      color: darkMode ? '#888' : '#999',
-      marginBottom: '16px',
-      letterSpacing: '0.5px',
     },
     exampleGrid: {
       display: 'grid',
@@ -375,8 +354,8 @@ function App() {
     },
     exampleChip: {
       padding: '10px 16px',
-      background: darkMode ? '#2d2d44' : '#f8f9fa',
-      border: `1px solid ${darkMode ? '#3d3d5c' : '#e5e5e5'}`,
+      background: darkMode ? '#2d2d44' : '#ffffff',
+      border: `1px solid ${darkMode ? '#3d3d5c' : '#e2e8f0'}`,
       borderRadius: '24px',
       fontSize: '13px',
       cursor: 'pointer',
@@ -401,12 +380,11 @@ function App() {
       fontSize: '14px',
     },
     bubble: {
-      maxWidth: '80%',
+      maxWidth: '70%',
       padding: '12px 18px',
       borderRadius: '20px',
       fontSize: '14px',
       lineHeight: '1.6',
-      transition: 'transform 0.2s, box-shadow 0.2s',
       whiteSpace: 'pre-wrap',
       wordBreak: 'break-word',
     },
@@ -417,7 +395,7 @@ function App() {
       right: 0,
       background: darkMode ? '#1e1e2f' : '#ffffff',
       padding: '20px',
-      borderTop: `1px solid ${darkMode ? '#2d2d44' : '#e5e5e5'}`,
+      borderTop: `1px solid ${darkMode ? '#2d2d44' : '#e2e8f0'}`,
     },
     bottomInputWrapper: {
       maxWidth: '800px',
@@ -427,12 +405,12 @@ function App() {
     bottomTextarea: {
       width: '100%',
       padding: '12px 50px 12px 20px',
-      border: `1px solid ${darkMode ? '#3d3d5c' : '#e0e0e0'}`,
+      border: `2px solid ${darkMode ? '#2d2d44' : '#e2e8f0'}`,
       borderRadius: '28px',
       fontSize: '14px',
       resize: 'none',
       outline: 'none',
-      background: darkMode ? '#2d2d44' : '#f8f9fa',
+      background: darkMode ? '#2d2d44' : '#ffffff',
       color: darkMode ? '#e5e5e5' : '#1e1e2f',
       fontFamily: 'inherit',
     },
@@ -453,11 +431,11 @@ function App() {
     },
     conversationItem: {
       padding: '10px 12px',
-      borderRadius: '12px',
+      borderRadius: '8px',
       cursor: 'pointer',
       transition: 'all 0.2s',
       marginBottom: '4px',
-      background: darkMode ? '#2d2d44' : '#f0f0f0',
+      background: 'transparent',
     },
     conversationTitle: {
       fontSize: '14px',
@@ -466,6 +444,7 @@ function App() {
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
+      color: darkMode ? '#e5e5e5' : '#1e1e2f',
     },
     conversationDate: {
       fontSize: '11px',
@@ -488,42 +467,29 @@ function App() {
       <div style={styles.container}>
         <header style={styles.header}>
           <div style={styles.headerContent}>
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={styles.menuButton}
-              onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f0f0f0'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-            >
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={styles.menuButton}>
               ☰
             </button>
             <span style={styles.title}>Nusantara Assistant</span>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              style={styles.themeButton}
-              onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f0f0f0'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-            >
+            <button onClick={() => setDarkMode(!darkMode)} style={styles.themeButton}>
               {darkMode ? '☀️' : '🌙'}
             </button>
           </div>
         </header>
 
         <div style={styles.sidebar}>
-          <button
-            onClick={createNewConversation}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: 500,
-              color: 'white',
-              marginBottom: '16px',
-            }}
-          >
+          <button onClick={createNewConversation} style={{
+            width: '100%',
+            padding: '12px',
+            background: '#667eea',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'white',
+            marginBottom: '16px',
+          }}>
             + New Chat
           </button>
           
@@ -532,66 +498,49 @@ function App() {
               RECENT CHATS
             </div>
             <div>
-              {[...conversations].reverse().map(conv => (
-                <div
-                  key={conv.id}
-                  onClick={() => loadConversation(conv)}
-                  style={{
-                    ...styles.conversationItem,
-                    background: currentConversationId === conv.id 
-                      ? (darkMode ? '#3d3d5c' : '#e0e0e0')
-                      : (darkMode ? '#2d2d44' : '#f5f5f5'),
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentConversationId !== conv.id) {
-                      e.currentTarget.style.background = darkMode ? '#3d3d5c' : '#e8e8e8'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (currentConversationId !== conv.id) {
-                      e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f5f5f5'
-                    }
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={styles.conversationTitle}>
-                        {conv.title === 'New Chat' && conv.messages.length > 0 
-                          ? (conv.messages[0]?.content?.substring(0, 30) + '...')
-                          : conv.title}
+              {[...conversations].reverse().map(conv => {
+                const isActive = currentConversationId === conv.id
+                return (
+                  <div
+                    key={conv.id}
+                    onClick={() => loadConversation(conv)}
+                    style={{
+                      ...styles.conversationItem,
+                      background: isActive ? (darkMode ? '#3d3d5c' : '#e0e0e0') : (darkMode ? '#2d2d44' : '#f5f5f5'),
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={styles.conversationTitle}>
+                          {conv.title === 'New Chat' && conv.messages.length > 0 
+                            ? (conv.messages[0]?.content?.substring(0, 30) + '...')
+                            : conv.title}
+                        </div>
+                        <div style={styles.conversationDate}>
+                          {formatDate(conv.updatedAt)}
+                        </div>
                       </div>
-                      <div style={styles.conversationDate}>
-                        {formatDate(conv.updatedAt)}
-                      </div>
+                      <button onClick={(e) => deleteConversation(conv.id, e)} style={styles.deleteButton}>
+                        🗑️
+                      </button>
                     </div>
-                    <button
-                      onClick={(e) => deleteConversation(conv.id, e)}
-                      style={styles.deleteButton}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
-                    >
-                      🗑️
-                    </button>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
           
-          <button
-            onClick={clearAllHistory}
-            style={{
-              width: '100%',
-              padding: '10px',
-              background: darkMode ? '#3d3d5c' : '#e0e0e0',
-              border: 'none',
-              borderRadius: '30px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              marginTop: '16px',
-              color: darkMode ? '#e5e5e5' : '#333',
-            }}
-          >
+          <button onClick={clearAllHistory} style={{
+            width: '100%',
+            padding: '10px',
+            background: darkMode ? '#3d3d5c' : '#e0e0e0',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            marginTop: '16px',
+            color: darkMode ? '#e5e5e5' : '#333',
+          }}>
             🗑️ Delete All History
           </button>
         </div>
@@ -616,28 +565,14 @@ function App() {
                       e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
                     }}
                   />
-                  <button
-                    onClick={sendMessage}
-                    disabled={loading || !message.trim()}
-                    style={{
-                      ...styles.sendButton,
-                      opacity: loading || !message.trim() ? 0.5 : 1,
-                    }}
-                  >
+                  <button onClick={sendMessage} disabled={loading || !message.trim()} style={{ ...styles.sendButton, opacity: loading || !message.trim() ? 0.5 : 1 }}>
                     ✨
                   </button>
                 </div>
                 
-                <div style={styles.plusButtonWrapper}>
-                  <button
-                    onClick={() => document.querySelector('textarea')?.focus()}
-                    style={styles.plusButton}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                  >
-                    <span style={{ fontSize: '18px' }}>+</span> Ask Nusantara Assistant
-                  </button>
-                </div>
+                <button onClick={() => document.querySelector('textarea')?.focus()} style={styles.plusButton}>
+                  + Ask Nusantara Assistant
+                </button>
                 
                 <div style={styles.flashBadge}>
                   ⚡ Flash
@@ -654,14 +589,6 @@ function App() {
                       onClick={() => {
                         setMessage(q)
                         setTimeout(() => sendMessage(), 100)
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = darkMode ? '#3d3d5c' : '#e8e8e8'
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f8f9fa'
-                        e.currentTarget.style.transform = 'translateY(0)'
                       }}
                     >
                       {q}
@@ -698,42 +625,29 @@ function App() {
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={styles.menuButton}
-            onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f0f0f0'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-          >
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={styles.menuButton}>
             ☰
           </button>
           <span style={styles.title}>Nusantara Assistant</span>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            style={styles.themeButton}
-            onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f0f0f0'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-          >
+          <button onClick={() => setDarkMode(!darkMode)} style={styles.themeButton}>
             {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
       </header>
 
       <div style={styles.sidebar}>
-        <button
-          onClick={createNewConversation}
-          style={{
-            width: '100%',
-            padding: '12px',
-            background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-            border: 'none',
-            borderRadius: '30px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 500,
-            color: 'white',
-            marginBottom: '16px',
-          }}
-        >
+        <button onClick={createNewConversation} style={{
+          width: '100%',
+          padding: '12px',
+          background: '#667eea',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 500,
+          color: 'white',
+          marginBottom: '16px',
+        }}>
           + New Chat
         </button>
         
@@ -742,66 +656,49 @@ function App() {
             RECENT CHATS
           </div>
           <div>
-            {[...conversations].reverse().map(conv => (
-              <div
-                key={conv.id}
-                onClick={() => loadConversation(conv)}
-                style={{
-                  ...styles.conversationItem,
-                  background: currentConversationId === conv.id 
-                    ? (darkMode ? '#3d3d5c' : '#e0e0e0')
-                    : (darkMode ? '#2d2d44' : '#f5f5f5'),
-                }}
-                onMouseEnter={(e) => {
-                  if (currentConversationId !== conv.id) {
-                    e.currentTarget.style.background = darkMode ? '#3d3d5c' : '#e8e8e8'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (currentConversationId !== conv.id) {
-                    e.currentTarget.style.background = darkMode ? '#2d2d44' : '#f5f5f5'
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={styles.conversationTitle}>
-                      {conv.title === 'New Chat' && conv.messages.length > 0 
-                        ? (conv.messages[0]?.content?.substring(0, 30) + '...')
-                        : conv.title}
+            {[...conversations].reverse().map(conv => {
+              const isActive = currentConversationId === conv.id
+              return (
+                <div
+                  key={conv.id}
+                  onClick={() => loadConversation(conv)}
+                  style={{
+                    ...styles.conversationItem,
+                    background: isActive ? (darkMode ? '#3d3d5c' : '#e0e0e0') : (darkMode ? '#2d2d44' : '#f5f5f5'),
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={styles.conversationTitle}>
+                        {conv.title === 'New Chat' && conv.messages.length > 0 
+                          ? (conv.messages[0]?.content?.substring(0, 30) + '...')
+                          : conv.title}
+                      </div>
+                      <div style={styles.conversationDate}>
+                        {formatDate(conv.updatedAt)}
+                      </div>
                     </div>
-                    <div style={styles.conversationDate}>
-                      {formatDate(conv.updatedAt)}
-                    </div>
+                    <button onClick={(e) => deleteConversation(conv.id, e)} style={styles.deleteButton}>
+                      🗑️
+                    </button>
                   </div>
-                  <button
-                    onClick={(e) => deleteConversation(conv.id, e)}
-                    style={styles.deleteButton}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
-                  >
-                    🗑️
-                  </button>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
         
-        <button
-          onClick={clearAllHistory}
-          style={{
-            width: '100%',
-            padding: '10px',
-            background: darkMode ? '#3d3d5c' : '#e0e0e0',
-            border: 'none',
-            borderRadius: '30px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            marginTop: '16px',
-            color: darkMode ? '#e5e5e5' : '#333',
-          }}
-        >
+        <button onClick={clearAllHistory} style={{
+          width: '100%',
+          padding: '10px',
+          background: darkMode ? '#3d3d5c' : '#e0e0e0',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '13px',
+          marginTop: '16px',
+          color: darkMode ? '#e5e5e5' : '#333',
+        }}>
           🗑️ Delete All History
         </button>
       </div>
@@ -824,10 +721,8 @@ function App() {
               <div
                 style={{
                   ...styles.bubble,
-                  background: msg.role === 'user'
-                    ? '#1e1e2f'
-                    : darkMode ? '#2d2d44' : '#f0f0f0',
-                  color: msg.role === 'user' ? '#ffffff' : darkMode ? '#e5e5e5' : '#1e1e2f',
+                  background: msg.role === 'user' ? '#667eea' : (darkMode ? '#2d2d44' : '#ffffff'),
+                  color: msg.role === 'user' ? '#ffffff' : (darkMode ? '#e5e5e5' : '#1e1e2f'),
                   borderBottomRightRadius: msg.role === 'user' ? '4px' : '20px',
                   borderBottomLeftRadius: msg.role === 'user' ? '20px' : '4px',
                 }}
@@ -842,7 +737,7 @@ function App() {
                 </div>
               </div>
               {msg.role === 'user' && (
-                <div style={{ ...styles.avatar, background: '#1e1e2f', color: 'white' }}>
+                <div style={{ ...styles.avatar, background: darkMode ? '#475569' : '#cbd5e1' }}>
                   👤
                 </div>
               )}
@@ -852,7 +747,7 @@ function App() {
           {loading && (
             <div style={{ ...styles.chatMessage, justifyContent: 'flex-start' }}>
               <div style={{ ...styles.avatar, background: darkMode ? '#2d2d44' : '#e8e8e8' }}>🤖</div>
-              <div style={{ ...styles.bubble, background: darkMode ? '#2d2d44' : '#f0f0f0' }}>
+              <div style={{ ...styles.bubble, background: darkMode ? '#2d2d44' : '#ffffff' }}>
                 <span style={styles.loadingDot}></span>
                 <span style={{ ...styles.loadingDot, animationDelay: '0.2s' }}></span>
                 <span style={{ ...styles.loadingDot, animationDelay: '0.4s' }}></span>
@@ -870,7 +765,7 @@ function App() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask Nusantara Assistant"
+            placeholder="Ask Nusantara Assistant..."
             rows="1"
             style={styles.bottomTextarea}
             onInput={(e) => {
@@ -878,15 +773,7 @@ function App() {
               e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
             }}
           />
-          <button
-            onClick={sendMessage}
-            disabled={loading || !message.trim()}
-            style={{
-              ...styles.sendButton,
-              right: '12px',
-              bottom: '10px',
-            }}
-          >
+          <button onClick={sendMessage} disabled={loading || !message.trim()} style={{ ...styles.sendButton, right: '12px', bottom: '10px' }}>
             ✨
           </button>
         </div>
