@@ -4,9 +4,6 @@ from pydantic import BaseModel
 from groq import Groq
 import os
 
-api_key = os.environ.get("GROQ_API_KEY")
-client = Groq(api_key=api_key)
-
 app = FastAPI()
 
 app.add_middleware(
@@ -20,18 +17,30 @@ class ChatRequest(BaseModel):
     message: str
 
 @app.get("/")
-def root():
-    return {"status": "OK"}
+def home():
+    return {"status": "OK", "message": "Nusantara Assistant API is running"}
 
 @app.post("/chat")
-def chat(request: ChatRequest):
+def chat(req: ChatRequest):
     try:
+        api_key = os.environ.get("GROQ_API_KEY")
+        
+        if not api_key:
+            return {"reply": "Error: GROQ_API_KEY tidak ditemukan. Silakan cek environment variable."}
+        
+        client = Groq(api_key=api_key)
+        
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": request.message}],
+            messages=[
+                {"role": "user", "content": req.message}
+            ],
             temperature=0.7,
             max_tokens=1024,
         )
-        return {"reply": completion.choices[0].message.content}
+        
+        reply = completion.choices[0].message.content
+        return {"reply": reply}
+        
     except Exception as e:
         return {"reply": f"Error: {str(e)}"}
